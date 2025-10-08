@@ -18,6 +18,16 @@ token_repo = RememberMeTokenRepository(db_connection)
 auth_service = AuthService(auth_repo, token_repo)
 
 def init_app_routes(app):
+    @app.route('/')
+    def index():
+        # Verifica se o usuário já tem uma sessão ativa
+        if 'user_id' in session:
+            # Se estiver logado, vai para a página geral
+            return redirect(url_for('general_page'))
+        else:
+            # Se não estiver logado, vai para a página de login
+            return redirect(url_for('login'))
+
     @app.route('/login', methods=['GET', 'POST'])
     def login():
         if request.method == 'GET':
