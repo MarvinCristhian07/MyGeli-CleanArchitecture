@@ -50,6 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
  
   // Tratamento do preenchimento e validação do formulário
   const form = document.querySelector('.login-form');
+  const nomeInput = document.getElementById('username');
+  const telefoneInput = document.getElementById('cellphone');
+  const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
   const confirmPasswordInput = document.getElementById('password2'); // Campo de confirmação de senha
   const errorMessage = document.querySelector('.error-message');
