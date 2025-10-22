@@ -17,13 +17,15 @@ DB_CONFIG = {
 }
 REMEMBER_DAYS = 30
 
-app = Flask(__name__) # O static_folder aponta para o diretório raiz para arquivos estáticos como CSS/JS dentro das subpastas
+# --- CORREÇÃO 1: Inicialização do Flask ---
+# Supondo que app.py está na raiz da pasta web-app e 'templates' está nela
+app = Flask(__name__, template_folder='templates', static_folder='static') 
+# Define explicitamente as pastas
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 
-# --- Serviços (Podem ser movidos para arquivos separados para modularidade) ---
-
-class UserDBService: # Um serviço mais geral para interações com o DB
+# --- Serviços (UserDBService continua o mesmo) ---
+class UserDBService:
     def __init__(self, db_config):
         self.db_config = db_config
 
@@ -46,14 +48,17 @@ class UserDBService: # Um serviço mais geral para interações com o DB
 
     def save_remember_token(self, user_id, selector, hashed_authenticator):
         expires_dt = datetime.utcnow() + timedelta(days=REMEMBER_DAYS)
-        expires_str = expires_dt.strftime('%Y-%m-%d %H:%M:%S')
+        # expires_str = expires_dt.strftime('%Y-%m-%d %H:%M:%S') # MySQL Connector/Python lida com datetime
 
         cnx = self.get_db_connection()
         cursor = cnx.cursor()
         try:
+            # Remove tokens antigos do mesmo usuário para evitar acúmulo (opcional, mas bom)
+            cursor.execute("DELETE FROM login_tokens WHERE user_id = %s", (user_id,))
+            
             cursor.execute(
                 "INSERT INTO login_tokens (user_id, selector, hashed_token, expires) VALUES (%s, %s, %s, %s)",
-                (user_id, selector, hashed_authenticator, expires_str)
+                (user_id, selector, hashed_authenticator, expires_dt) # Passa o objeto datetime
             )
             cnx.commit()
             return selector, hashed_authenticator, expires_dt
@@ -70,18 +75,17 @@ db_service = UserDBService(DB_CONFIG)
 
 @app.route('/')
 def home():
-    # Se você quiser uma página inicial diferente, pode renderizar outro template
-    # Por agora, redireciona para o login
+    # Redireciona para o login se não estiver logado, senão para a página geral
+    if 'user_id' in session:
+        return redirect(url_for('general_page'))
     return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template('login-page.html')
+        return render_template('login-page.html') # Caminho correto
 
-    if 'login' not in request.form:
-        abort(400, "Requisição inválida.")
-
+    # ... (lógica do POST continua a mesma) ...
     try:
         email = request.form.get('email', '').strip()
         senha = request.form.get('senha', '')
@@ -101,63 +105,52 @@ def login():
         session.clear()
         session['user_id'] = user['id']
 
-        response = make_response(redirect(url_for('general_page'))) # Altere para sua página geral após o login
+        response = make_response(redirect(url_for('general_page'))) 
 
         if lembrar:
             selector, authenticator, hashed_authenticator = db_service.create_remember_token()
-            db_service.save_remember_token(user['id'], selector, hashed_authenticator) # Note que 'save_remember_token' já tem a lógica de expiração
-
+            db_service.save_remember_token(user['id'], selector, hashed_authenticator)
             cookie_expires = datetime.utcnow() + timedelta(days=REMEMBER_DAYS)
-            cookie_value = f"{selector}:{authenticator}" # O authenticator NÃO HASHED é usado no cookie
-
-            response.set_cookie(
-                'remember_me',
-                cookie_value,
-                expires=cookie_expires,
-                path='/',
-                httponly=True,
-                secure=False, # Mude para True em produção com HTTPS
-                samesite='Lax'
-            )
+            cookie_value = f"{selector}:{authenticator}"
+            response.set_cookie('remember_me', cookie_value, expires=cookie_expires, path='/', httponly=True, secure=False, samesite='Lax')
         return response
 
+    # --- CORREÇÃO 2: Caminhos nos Erros ---
     except ValueError as ve:
-        return render_template('login_page/index.html', error=str(ve)), 400
+        return render_template('login-page.html', error=str(ve)), 400 # Caminho correto
     except RuntimeError as re:
-        return render_template('login_page/index.html', error=str(re)), 500
+        return render_template('login-page.html', error=str(re)), 500 # Caminho correto
     except Exception as e:
-        return render_template('login_page/index.html', error=f"Erro inesperado: {e}"), 500
+        # É bom logar o erro 'e' aqui para depuração
+        print(f"Erro inesperado no login: {e}") 
+        return render_template('login-page.html', error="Erro inesperado. Tente novamente."), 500 # Caminho correto
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
-        return render_template('register-page.html')
+        return render_template('register-page.html') # Caminho correto
 
-    if 'cadastrar' not in request.form:
-        abort(400, "Requisição inválida.")
-
+    # ... (lógica do POST continua a mesma) ...
     try:
         nome = request.form.get('nome', '').strip()
         telefone = request.form.get('telefone', '').strip()
         email = request.form.get('email', '').strip()
         senha = request.form.get('senha', '')
         confirm_senha = request.form.get('confirm-senha', '')
-        remember = request.form.get('remember') is not None # Renomeei para evitar conflito com 'lembrar'
+        remember = request.form.get('remember') is not None
 
         if not nome or not email or not senha:
             raise ValueError("Campos obrigatórios ausentes.")
-
         if senha != confirm_senha:
             raise ValueError("As senhas não coincidem.")
-
         if len(senha) < 6:
             raise ValueError("A senha deve ter no mínimo 6 caracteres.")
 
         senha_hash = generate_password_hash(senha)
 
         cnx = db_service.get_db_connection()
-        cursor = cnx.cursor(buffered=True)
+        cursor = cnx.cursor()
         try:
             cursor.execute(
                 "INSERT INTO usuarios (nome, telefone, email, senha) VALUES (%s, %s, %s, %s)",
@@ -178,39 +171,42 @@ def register():
         session.clear()
         session['user_id'] = user_id
 
-        response = make_response(redirect(url_for('general_page'))) # Redirecionar para a página geral após o cadastro
+        response = make_response(redirect(url_for('general_page'))) 
 
         if remember:
             selector, authenticator, hashed_authenticator = db_service.create_remember_token()
             db_service.save_remember_token(user_id, selector, hashed_authenticator)
-
             cookie_expires = datetime.utcnow() + timedelta(days=REMEMBER_DAYS)
             cookie_value = f"{selector}:{authenticator}"
-
-            response.set_cookie(
-                'remember_me',
-                cookie_value,
-                expires=cookie_expires,
-                path='/',
-                httponly=True,
-                secure=False, # Mude para True em produção com HTTPS
-                samesite='Lax'
-            )
+            response.set_cookie('remember_me', cookie_value, expires=cookie_expires, path='/', httponly=True, secure=False, samesite='Lax')
         return response
 
+    # --- CORREÇÃO 2: Caminhos nos Erros ---
     except ValueError as ve:
-        return render_template('register_page/index.html', error=str(ve)), 400
+        return render_template('register-page.html', error=str(ve)), 400 # Caminho correto
     except RuntimeError as re:
-        return render_template('register_page/index.html', error=str(re)), 500
+        return render_template('register-page.html', error=str(re)), 500 # Caminho correto
     except Exception as e:
-        return render_template('register_page/index.html', error=f"Erro inesperado: {e}"), 500
+        # É bom logar o erro 'e' aqui para depuração
+        print(f"Erro inesperado no registro: {e}") 
+        return render_template('register-page.html', error="Erro inesperado. Tente novamente."), 500 # Caminho correto
 
 
-@app.route('/general-page/index') # Exemplo de rota para a página após o login
+# --- CORREÇÃO 3: Renderizar Template na Página Geral ---
+@app.route('/general-page') # Rota mais simples
 def general_page():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return "Bem-vindo à página geral! (Conteúdo protegido)"
+    # Aqui você pode buscar dados do usuário se precisar e passar para o template
+    # user_data = buscar_dados_usuario(session['user_id']) 
+    return render_template('general-page.html') # Renderiza o HTML
+
+@app.route('/chatbot') # Defines the URL, e.g., http://127.0.0.1:5000/chatbot
+def chatbot_page():
+    # Add protection: Check if user is logged in
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('chatbot-page.html') # Tells Flask to render this HTML file
 
 
 if __name__ == '__main__':

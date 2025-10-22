@@ -31,7 +31,7 @@ class GeminiAPI:
             genai.configure(api_key=api_key)
             
             # AGORA USAMOS A VARIÁVEL IMPORTADA!
-            self.model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=prompts.SYSTEM_INSTRUCTION_CHAT)
+            self.model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=prompts.SYSTEM_INSTRUCTION_CHAT)
             self.chat_session = self.model.start_chat(history=[])
             print("Log: Módulo GeminiAPI inicializado com sucesso.")
 
