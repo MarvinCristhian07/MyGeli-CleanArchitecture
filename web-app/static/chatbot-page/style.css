@@ -110,7 +110,10 @@ body {
 }
 
 .container {
+  overflow-y: auto;
   padding: 32px 0 60px;
+  max-height: calc(100vh - 127px);
+  scrollbar-color: var(--scrollbar-color) transparent;
 }
 
 .container :where(.app-header, .suggestions, .message, .prompt-wrapper, .disclaimer-text) {
@@ -118,6 +121,7 @@ body {
   width: 100%;
   padding: 0 20px;
   max-width: 980px;
+  position: relative;
 }
 
 /* Classe para mostrar o body após o carregamento */
@@ -320,7 +324,8 @@ body.loaded {
   margin-right: 7px;
 }
 
-.prompt-form .prompt-actions button {
+.prompt-wrapper .prompt-form :where(.file-upload-wrapper, button, img) {
+  position: relative;
   height: 45px;
   width: 45px;
 }
@@ -337,6 +342,28 @@ body.loaded {
 
 .prompt-form #send-prompt-btn:hover {
   background: #0264e3;
+}
+
+.prompt-form .file-upload-wrapper :where(button, img) {
+  position: absolute;
+  border-radius: 50%;
+  object-fit: cover;
+  display: none;
+}
+
+.prompt-form .file-upload-wrapper #add-file-btn,
+.prompt-form .file-upload-wrapper.active img,
+.prompt-form .file-upload-wrapper.active:hover
+#cancel-file-btn {
+    display: block;
+}
+
+.prompt-form .file-upload-wrapper.active #add-file-btn {
+  display: none;
+}
+
+.prompt-form #cancel-file-btn {
+  color: #d62939;
 }
 
 .prompt-container .disclaimer-text {

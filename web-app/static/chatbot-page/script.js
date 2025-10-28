@@ -28,11 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
   updateProgress();
  
   // ----------------------------------------------------- //
+  const container = document.querySelector(".container");
   const chatsContainer = document.querySelector(".chats-container");
   const promptForm = document.querySelector(".prompt-form");
   const promptInput = document.querySelector(".prompt-input");
   
-  const API_KEY = "";
+  const API_KEY = "AIzaSyAWdU1NiXHbiL7wnZSANHS-_VRu_odbg9I";
   const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
  
   let userMessage = "";
@@ -44,9 +45,27 @@ document.addEventListener('DOMContentLoaded', () => {
     div.innerHTML = content;
     return div;
   }
+
+  const scrollToBottom = () => container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+
+  const typingEffect = (text, textElement, botMsgDiv) => {
+    textElement.textContent = "";
+    const words = text.split(" ");
+    let wordIndex = 0;
+
+    const typingInterval = setInterval(() => {
+      if(wordIndex < words.length) {
+        textElement.textContent += (wordIndex === 0 ? "" : " ") + words[wordIndex++];
+        botMsgDiv.classList.remove("loading");
+        scrollToBottom();
+      } else {
+        clearInterval(typingInterval);
+      }
+    }, 40);
+  }
   
-  const generateResponse = async (botMsgHTML) => {
-    const textElement = botMsgHTML.querySelector(".message-text");
+  const generateResponse = async (botMsgDiv) => {
+    const textElement = botMsgDiv.querySelector(".message-text");
     
     chatHistory.push({
       role: "user",
@@ -64,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if(!response.ok) throw new Error(data.error.message);
       
       const responseText = data.candidates[0].content.parts[0].text.replace(/\*\*([^*]+)\*\*/g, "$1").trim();
-      textElement.textContent = responseText;
+      typingEffect(responseText, textElement, botMsgDiv);
     } catch (error) {
       console.log(error);
     }
@@ -82,11 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
    
     userMsgDiv.querySelector(".message-text").textContent = userMessage;
     chatsContainer.appendChild(userMsgDiv);
+    scrollToBottom();
    
     setTimeout(() => {
-      const botMsgHTML = `<img src="https://raw.githubusercontent.com/FoodYze/MyGeli/refs/heads/main/App/build_Heitor/build/assets/frame1/geli_icon.png" alt="Imagem da Geli" class="avatar">Just a sec...<p class="message-text"></p>`;
+      const botMsgHTML = `<img src="https://raw.githubusercontent.com/FoodYze/MyGeli/refs/heads/main/App/build_Heitor/build/assets/frame1/geli_icon.png" alt="Imagem da Geli" class="avatar"><p class="message-text">Just a sec...</p>`;
       const botMsgDiv = createMsgElement(botMsgHTML, "bot-message", "loading");
       chatsContainer.appendChild(botMsgDiv);
+      scrollToBottom();
       generateResponse(botMsgDiv);
     }, 600);
   }

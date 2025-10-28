@@ -55,3 +55,33 @@ class AuthRepository:
         finally:
             cursor.close()
             cnx.close()
+
+class UserProfileRepository:
+    def __init__(self, db_connection):
+        self.db = db_connection
+
+    def get_user_details_by_id(self, user_id):
+        cnx = self.db.get_connection()
+        cursor = cnx.cursor(dictionary=True)
+        try:
+            query = "SELECT nome, email, preferencias FROM usuarios WHERE id = %s"
+            cursor.execute(query, (user_id,))
+            user_data = cursor.fetchone()
+            return user_data
+        finally:
+            cursor.close()
+            cnx.close()
+
+    def update_user_preferences(self, user_id, preferences_json):
+        cnx = self.db.get_connection()
+        cursor = cnx.cursor()
+        try:
+            query = "UPDATE usuarios SET preferencias = %s WHERE id = %s"
+            cursor.execute(query, (preferences_json, user_id))
+            cnx.commit()
+        except mysql.connector.Error as e:
+            cnx.rollback()
+            raise RuntimeError(f"Erro ao atualizar preferências: {e}")
+        finally:
+            cursor.close()
+            cnx.close()

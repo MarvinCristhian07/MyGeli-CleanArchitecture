@@ -5,6 +5,8 @@ from mysql.connector import errorcode, IntegrityError
 import os
 import hashlib
 from datetime import datetime, timedelta
+import json
+from infrastructure.database_repository import UserProfileRepository, MySQLConnection
 
 # --- Configurações Comuns ---
 DB_CONFIG = {
@@ -70,6 +72,9 @@ class UserDBService:
             cnx.close()
 
 db_service = UserDBService(DB_CONFIG)
+
+mysql_connection = MySQLConnection(DB_CONFIG['host'], DB_CONFIG['user'], DB_CONFIG['password'], DB_CONFIG['database'])
+user_profile_repo = UserProfileRepository(mysql_connection)
 
 # --- Rotas ---
 
@@ -203,10 +208,47 @@ def general_page():
 
 @app.route('/chatbot') # Defines the URL, e.g., http://127.0.0.1:5000/chatbot
 def chatbot_page():
-    # Add protection: Check if user is logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('chatbot-page.html') # Tells Flask to render this HTML file
+    return render_template('chatbot-page.html')
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    success_message = None
+
+    if request.method == 'POST':
+        preferences_data = {
+            'allergies': request.form.get('allergies', ''),
+            'dietary_restrictions': request.form.get('dietary_restrictions', ''),
+            'other': request.form.get('other', '')
+        }
+        # Converte o dicionário para uma string JSON
+        preferences_json = json.dumps(preferences_data)
+        
+        try:
+            user_profile_repo.update_user_preferences(user_id, preferences_json)
+            success_message = "Preferências salvas com sucesso!"
+        except RuntimeError as e:
+            print(e)
+            pass 
+
+    # Busca os dados atuais do usuário (para GET e para recarregar após POST)
+    user_data = user_profile_repo.get_user_details_by_id(user_id)
+    
+    user_preferences = {'allergies': '', 'dietary_restrictions': '', 'other': ''}
+    if user_data.get('preferencias'):
+        user_preferences = json.loads(user_data['preferencias'])
+    
+    return render_template(
+        'profile-page.html', 
+        user=user_data, 
+        user_preferences=user_preferences,
+        success_message=success_message
+    )
 
 
 if __name__ == '__main__':
