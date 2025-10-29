@@ -18,6 +18,17 @@
   --scrollbar-color: #626a7f;
 }
 
+body.light-theme {
+  /* Light theme colors */
+  --text-color: #090c13;
+  --subheading-color: #7b8cae;
+  --placeholder-color: #606982;
+  --primary-color: #f3f7ff;
+  --secondary-color: #dce6f9;
+  --secondary-hover-color: #d2ddf2;
+  --scrollbar-color: #a2aac2;
+}
+
 /* Estilos da tela de carregamento */
 .loader-wrapper {
   position: fixed;
@@ -157,7 +168,7 @@ body.loaded {
   scrollbar-width: none;
 }
 
-.container :is(.app-header, .suggestions) {
+body.chats-active .container :where(.app-header, .suggestions) {
   display: none;
 }
 
@@ -264,6 +275,26 @@ body.loaded {
   background: var(--secondary-color);
 }
 
+.chats-container .user-message .img-attachment {
+  width: 50%;
+  margin-top: -7px;
+  border-radius: 13px 3px 13px 13px;
+}
+
+.chats-container .user-message .file-attachment {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 10px;
+  margin-top: -7px;
+  border-radius: 13px 3px 13px 13px;
+  background: var(--secondary-color);
+}
+
+.chats-container .user-message .file-attachment span {
+  color: #1d7efd;
+}
+
 .prompt-container {
   position: fixed;
   bottom: 0;
@@ -315,7 +346,7 @@ body.loaded {
   transition: 0.3s ease;
 }
 
-.prompt-wrapper button:hover {
+.prompt-wrapper :is(button:hover, .file-icon, #cancel-file-btn) {
   background: var(--secondary-hover-color);
 }
 
@@ -352,7 +383,8 @@ body.loaded {
 }
 
 .prompt-form .file-upload-wrapper #add-file-btn,
-.prompt-form .file-upload-wrapper.active img,
+.prompt-form .file-upload-wrapper.active.img-attached img,
+.prompt-form .file-upload-wrapper.active.file-attached .file-icon,
 .prompt-form .file-upload-wrapper.active:hover
 #cancel-file-btn {
     display: block;
@@ -362,8 +394,21 @@ body.loaded {
   display: none;
 }
 
-.prompt-form #cancel-file-btn {
+.prompt-form :is(#cancel-file-btn, #stop-response-btn:hover) {
   color: #d62939;
+}
+
+.prompt-form .file-icon {
+  color: #1d7efd;
+}
+
+.prompt-form #stop-response-btn,
+body.bot-responding .prompt-form .file-upload-wrapper{
+  display: none;
+}
+
+body.bot-responding .prompt-form #stop-response-btn {
+  display: block;
 }
 
 .prompt-container .disclaimer-text {

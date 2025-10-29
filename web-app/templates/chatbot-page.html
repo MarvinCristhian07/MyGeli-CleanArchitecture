@@ -33,26 +33,26 @@
 
   <div class="container" id="main-content">
     <header class="app-header">
-      <h1 class="heading">Hello, there</h1>
-      <h2 class="sub-heading">How can I help you?</h2>
+      <h1 class="heading">Olá</h1>
+      <h2 class="sub-heading">Como posso te ajudar?</h2>
     </header>
    
     <ul class="suggestions">
       <li class="suggestions-item">
-        <p class="text">Design a home office setup for remote work under $500.</p>
-        <span class="material-symbols-rounded">draw</span>
+        <p class="text">Monte um plano de alimentação para déficit calórico.</p>
+        <span class="material-symbols-rounded">calendar_meal</span>
       </li>
       <li class="suggestions-item">
-        <p class="text">How can I level up my web development expertise in 2025?</p>
-        <span class="material-symbols-rounded">lightbulb</span>
+        <p class="text">Ideia de receita fácil e rápida que rende 4 porções.</p>
+        <span class="material-symbols-rounded">hand_meal</span>
       </li>
       <li class="suggestions-item">
-        <p class="text">Suggest some useful tools for debugging JavaScript code.</p>
-        <span class="material-symbols-rounded">explore</span>
+        <p class="text">Como posso utilizar os alimentos do meu estoque.</p>
+        <span class="material-symbols-rounded">kitchen</span>
       </li>
       <li class="suggestions-item">
-        <p class="text">Create a React JS component for the simple todo list app.</p>
-        <span class="material-symbols-rounded">code_blocks</span>
+        <p class="text">Monte um cardápio semanal para alimentação Low Carb.</p>
+        <span class="material-symbols-rounded">menu_book</span>
       </li>
     </ul>
    
@@ -61,14 +61,16 @@
     <div class="prompt-container">
       <div class="prompt-wrapper">
         <form action="#" class="prompt-form">
-          <input type="text" placeholder="Ask Geli..." class="prompt-input" required>
+          <input type="text" placeholder="Fale com a Geli..." class="prompt-input" required>
           <div class="prompt-actions">
-            <div class="file-upload-wrapper active file-attached">
-              <img src="" class="file-preview">
+            <div class="file-upload-wrapper">
+              <img src="#" class="file-preview">
+              <input type="file" accept="image/*, .pdf, .txt, .csv" id="file-input" hidden>
               <button type="button" class="file-icon material-symbols-rounded">description</button>
               <button id="add-file-btn" type="button" class="material-symbols-rounded">attach_file</button>
               <button id="cancel-file-btn" type="button" class="material-symbols-rounded">close</button>
             </div>
+            <button type="button" id="stop-response-btn" class="material-symbols-rounded">stop_circle</button>
             <button id="send-prompt-btn" class="material-symbols-rounded">arrow_upward</button>
           </div>
         </form>
@@ -77,9 +79,14 @@
         <button id="delete-chats-btn" class="material-symbols-rounded">delete</button>
       </div>
      
-      <p class="disclaimer-text">Geli can make mistakes, so double-check it.</p>
+      <p class="disclaimer-text">Geli pode cometer erros, então verifique as respostas.</p>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+        const GeliIconURL = "{{ url_for('static', filename='chatbot-page/assets/geli_icon.png') }}";
+    </script>
   <script src="{{ url_for('static', filename='chatbot-page/script.js') }}"></script>
 </body>
 </html>
