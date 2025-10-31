@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
   # EASTER EGGS!
   "Sempre que o usuário digitar: 'E o jogo?', você deve responder 'Pen-drive corrompeu, noooooooooooooooooooooooo :('"
   "Sempre que o usuário digitar: 'VSCode?', você deve responder 'Tema claro > Tema escuro'"
-  "Sempre que o usuário digitar: 'FatecRC', você deve responder 'Fredinho'"
+  "Sempre que o usuário digitar: 'FatecRC', você deve responder 'Fredinho 🐓'"
   `;
  
   let typingInterval, controller;

@@ -126,7 +126,13 @@ body {
   margin-top: 20px;
   width: 150px;
   height: 150px;
-  background: #ffffff;
+  border-radius: 50%;
+  border: 3px solid #3FCEF6;
+  background: none;
+  background-image: url('./assets/geli_icon.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .nav-drawer li a:hover {
@@ -314,8 +320,8 @@ body.chats-active .container :where(.app-header, .suggestions) {
 .prompt-container {
   position: fixed;
   bottom: 0;
-  left: 0;
-  width: 100%;
+  left: 250px;
+  width: calc(100% - 250px);
   padding: 16px 0;
   background: var(--primary-color);
 }
@@ -434,9 +440,10 @@ body.bot-responding .prompt-form #stop-response-btn {
   color: var(--placeholder-color);
 }
 
-@media (max-width: 768px;) {
+@media (max-width: 768px) {
   .container {
     padding: 20px 0 100px;
+
   }
   
   .app-header :is(.heading, .sub-heading) {
@@ -450,5 +457,19 @@ body.bot-responding .prompt-form #stop-response-btn {
   
   .prompt-wrapper.hide-controls :where(#theme-toggle-btn, #delete-chats-btn) {
     display: none;
+  }
+
+  .prompt-container {
+    left: 0;
+    width: 100%;
+  }
+
+  .nav-drawer {
+    margin-left: -250px;
+  }
+
+  .suggestions .suggestions-item {
+    width: 200px;
+    padding: 10px;
   }
 }
