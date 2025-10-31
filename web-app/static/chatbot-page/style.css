@@ -83,22 +83,27 @@ body.light-theme {
 /* Estilos da sua página */
 body {
   color: var(--text-color);
-  background: var(--primary-color); /* Cor de fundo da página principal */
+  background: var(--primary-color);
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
 /* Estilos do menu e do conteúdo */
 .nav-drawer {
-  position: fixed;
+  /* position: fixed;
   top: 0;
-  left: 0;
+  left: 0; */
   width: 250px;
-  height: 100%;
+  height: 100vh;
   background-color: #002333; /* Fundo escuro do menu */
   color: #159A9C;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   z-index: 999;
+  flex-shrink: 0;
 }
 
 .nav-drawer ul {
@@ -115,6 +120,15 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.logo {
+  display: flex;
+  margin: 0 auto;
+  margin-top: 20px;
+  width: 150px;
+  height: 150px;
+  background: #ffffff;
+}
+
 .nav-drawer li a:hover {
   background-color: #318EAD; /* Fundo do link ao passar o mouse */
   color: #FFFFFF;
@@ -125,6 +139,8 @@ body {
   padding: 32px 0 60px;
   max-height: calc(100vh - 127px);
   scrollbar-color: var(--scrollbar-color) transparent;
+  flex-grow: 1;
+  position: relative;
 }
 
 .container :where(.app-header, .suggestions, .message, .prompt-wrapper, .disclaimer-text) {
@@ -416,4 +432,23 @@ body.bot-responding .prompt-form #stop-response-btn {
   font-size: 0.9rem;
   padding: 16px 20px 0;
   color: var(--placeholder-color);
+}
+
+@media (max-width: 768px;) {
+  .container {
+    padding: 20px 0 100px;
+  }
+  
+  .app-header :is(.heading, .sub-heading) {
+    font-size: 2rem;
+    line-height: 1.4;
+  }
+  
+  .prompt-form .file-upload-wrapper.active #cancel-file-btn {
+    opacity: 0;
+  }
+  
+  .prompt-wrapper.hide-controls :where(#theme-toggle-btn, #delete-chats-btn) {
+    display: none;
+  }
 }
