@@ -8,47 +8,52 @@ body {
     display: flex;
 }
 
+/* Estilos do menu e do conteúdo */
 .nav-drawer {
-    width: 220px;
-    background-color: #04080D;
-    padding: 20px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  /* position: fixed;
+  top: 0;
+  left: 0; */
+  width: 250px;
+  height: 100vh;
+  background-color: #002333; /* Fundo escuro do menu */
+  color: #159A9C;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  flex-shrink: 0;
 }
 
 .nav-drawer ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 20px 0;
+  margin: 0;
 }
 
-.nav-drawer ul li a {
-    color: #E0E1DD;
-    text-decoration: none;
-    display: block;
-    padding: 15px 20px;
-    border-radius: 8px;
-    margin-bottom: 10px;
+.nav-drawer li a {
+  display: block;
+  padding: 15px 30px;
+  color: #FFFFFF; /* Cor do texto do menu */
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.nav-drawer ul li a:hover {
-    background-color: #1B263B;
+.logo {
+  display: flex;
+  margin: 0 auto;
+  margin-top: 20px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 3px solid #3FCEF6;
+  background: none;
+  background-image: url('./assets/geli_icon.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-.nav-profile-link a {
-     color: #E0E1DD;
-    text-decoration: none;
-    display: block;
-    padding: 15px 20px;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.nav-profile-link a.active {
-    background-color: #159A9C; /* Destaque azul/verde */
-    font-weight: bold;
+.nav-drawer li a:hover {
+  background-color: #318EAD; /* Fundo do link ao passar o mouse */
+  color: #FFFFFF;
 }
 
 .container {

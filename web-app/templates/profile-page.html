@@ -11,19 +11,16 @@
 </head>
 <body>
 
-    <nav class="nav-drawer">
-        <ul>
-            <!-- Adicione links para outras páginas conforme necessário -->
-            <li><a href="{{ url_for('general_page') }}">Geral</a></li>
-            <li><a href="{{ url_for('chatbot_page') }}">Chat</a></li>
-            <li><a href="#">Receitas</a></li>
-            <li><a href="#">Estoque</a></li>
-            <!-- Opcional: Adicionar um link de logout -->
-        </ul>
-        <div class="nav-profile-link">
-             <a href="{{ url_for('profile') }}" class="active">Meu Perfil</a>
-        </div>
-    </nav>
+    <nav class="nav-drawer" aria-label="Menu de Navegação Principal">
+    <div class="logo"></div>
+    <ul>
+      <li><a href="#">Geral</a></li>
+      <li><a href="{{ url_for('chatbot_page')}}">Chat</a></li>
+      <li><a href="#">Receitas</a></li>
+      <li><a href="#">Estoque</a></li>
+      <li style="background-color: #318EAD;"><a href="{{ url_for('profile') }}">Meu Perfil</a></li>
+    </ul>
+  </nav>
 
     <div class="container">
         <header>

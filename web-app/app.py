@@ -210,7 +210,37 @@ def general_page():
 def chatbot_page():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('chatbot-page.html')
+    
+    user_id = session['user_id']
+    stock_dict = {}
+    cnx = None
+    cursor = None
+    
+    try:
+        cnx = db_service.get_db_connection()
+        cursor = cnx.cursor(dictionary=True)
+        
+        query = "SELECT nome_produto, quantidade_produto, tipo_volume from produtos WHERE user_id = %s"
+        cursor.execute(query, (user_id,))
+        
+        for row in cursor.fetchall():
+            item_name = row['nome_produto']
+            item_qty = row['quantidade_produto']
+            item_unit = row['tipo_volume']
+            
+            stock_dict[item_name] = f"{item_qty} {item_unit}"
+            
+    except mysql.connector.Error as err:
+        print(f"Erro ao buscar estoque do usuário {user_id}: {err}")
+    finally:
+        if cursor:
+            cursor.close()
+        if cnx:
+            cnx.close()
+            
+    stock_json = json.dumps(stock_dict)
+    
+    return render_template('chatbot-page.html', user_stock_json=stock_json)
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
